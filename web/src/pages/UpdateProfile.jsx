@@ -1,34 +1,55 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { validate } from "../validators/Validate";
+import { UpdateProfileSchema } from "../validators/Users";
 
 const UpdateProfile = () => {
-  const nameRef = useRef();
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const confirmPassRef = useRef();
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const user = {
+  const currentUser = {
     name: "John Doe",
     email: "johndoe@example.com",
   };
 
+  const [formData, setFormData] = useState({
+    name: currentUser.name,
+    email: currentUser.email,
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (passwordRef.current.value !== confirmPassRef.current.value) {
-      return setError("Passwords don't match");
-    }
-
     try {
+      e.preventDefault();
       setLoading(true);
+      setError("");
+      
+      let updatedData = null;
+
+      if(formData.name !== currentUser.name) updatedData = {...updatedData, name: formData.name};
+      if(formData.email !== currentUser.email) updatedData = {...updatedData, email: formData.email};
+      if(formData.password !== "") updatedData = {...updatedData, password: formData.password};
+      
+      if(!updatedData){
+        setLoading(false);
+        return setError("Nothing has been changed")
+      }
+
+      const { validationError } = await validate(UpdateProfileSchema, updatedData);
+      if(validationError){
+        setLoading(false);
+        return setError(validationError)
+      }
+
+      setLoading(false);
     } catch (error) {
       console.error(error);
     }
-    setLoading(false);
   };
 
   return (
@@ -40,22 +61,34 @@ const UpdateProfile = () => {
           <Form onSubmit={handleSubmit}>
             <Form.Group id="name">
               <Form.Label>Name</Form.Label>
-              <Form.Control type="text" ref={nameRef} value={user.name} />
+              <Form.Control
+                type="text"
+                name="name"
+                onChange={handleChange}
+                value={formData.name}
+              />
             </Form.Group>
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} value={user.email} />
+              <Form.Control
+                type="text"
+                name="email"
+                onChange={handleChange}
+                value={formData.email}
+              />
             </Form.Group>
             <Form.Group id="password">
               <Form.Label>New Password</Form.Label>
               <Form.Control
                 type="password"
-                ref={passwordRef}
+                name="password"
+                onChange={handleChange}
+                value={formData.password}
                 placeholder="Leave blank to keep same"
               />
             </Form.Group>
             <Button disabled={loading} className="w-100 mt-4" type="submit">
-              UpdateProfile
+              Update Profile
             </Button>
           </Form>
         </Card.Body>

@@ -1,30 +1,45 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
+import { SignUpSchema } from "../validators/Users";
+import { validate } from "../validators/Validate";
 
 const SignUp = () => {
-  const nameRef = useRef();
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const confirmPassRef = useRef();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPass: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (passwordRef.current.value !== confirmPassRef.current.value) {
-      return setError("Passwords don't match");
-    }
-
     try {
+      e.preventDefault();
+
       setLoading(true);
+      setError("");
+
+      if (formData.password !== formData.confirmPass) {
+        return setError("Passwords don't match");
+      }
+      const { validationError } = await validate(SignUpSchema, formData);
+      if(validationError){
+        setLoading(false);
+        return setError(validationError)
+      }
+
+      setLoading(false);
     } catch (error) {
       console.error(error);
     }
-    setLoading(false);
   };
 
   return (
@@ -36,19 +51,39 @@ const SignUp = () => {
           <Form onSubmit={handleSubmit}>
             <Form.Group id="name">
               <Form.Label>Name</Form.Label>
-              <Form.Control type="text" ref={nameRef} />
+              <Form.Control
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+              />
             </Form.Group>
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} />
+              <Form.Control
+                type="text"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
             </Form.Group>
             <Form.Group id="password">
               <Form.Label>Password</Form.Label>
-              <Form.Control type="password" ref={passwordRef} />
+              <Form.Control
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
             </Form.Group>
             <Form.Group id="confirmPass">
               <Form.Label>Confirm Password</Form.Label>
-              <Form.Control type="password" ref={confirmPassRef} />
+              <Form.Control
+                type="password"
+                name="confirmPass"
+                value={formData.confirmPass}
+                onChange={handleChange}
+              />
             </Form.Group>
             <Button disabled={loading} className="w-100 mt-4" type="submit">
               SignUp
@@ -57,7 +92,7 @@ const SignUp = () => {
         </Card.Body>
       </Card>
       <div className="w-100 text-center mt-2">
-        Don't have an account? <Link to={"/signup"}>Sign Up</Link>
+        Already have an account? <Link to={"/login"}>Login</Link>
       </div>
     </>
   );
