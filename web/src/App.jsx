@@ -8,7 +8,7 @@ const SignUp = lazy(() => import("./pages/SignUp"));
 const UpdateProfile = lazy(()=> import("./pages/UpdateProfile"));
 const NotFound = lazy(() => import("./pages/404"));
 
-const LoadingFallback = () => <div>Loading...</div>;
+const LoadingFallback = () => <h2 className="text-center mb-4">Loading...</h2>;
 
 function App() {
   return (
