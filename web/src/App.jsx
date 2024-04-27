@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Container } from "react-bootstrap";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Login = lazy(() => import("./pages/Login"));
@@ -19,11 +20,13 @@ function App() {
       <div className="w-100" style={{ maxWidth: "400px" }}>
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/update-profile" element={<UpdateProfile />} />
             <Route path="*" element={<NotFound />} />
+            <Route element={<ProtectedRoutes />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/update-profile" element={<UpdateProfile />} />
+            </Route>
           </Routes>
         </Suspense>
       </div>
