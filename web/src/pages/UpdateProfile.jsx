@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { validate } from "../validators/Validate";
 import { UpdateProfileSchema } from "../validators/Users";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const UpdateProfile = () => {
-  const currentUser = {
-    name: "John Doe",
-    email: "johndoe@example.com",
-  };
+  const { currentUser, updateUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: currentUser.name,
@@ -20,33 +22,42 @@ const UpdateProfile = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
       setLoading(true);
       setError("");
-      
-      let updatedData = null;
 
-      if(formData.name !== currentUser.name) updatedData = {...updatedData, name: formData.name};
-      if(formData.email !== currentUser.email) updatedData = {...updatedData, email: formData.email};
-      if(formData.password !== "") updatedData = {...updatedData, password: formData.password};
-      
-      if(!updatedData){
+      let updatedData = null;
+      if (formData.name !== currentUser.name)
+        updatedData = { ...updatedData, name: formData.name };
+      if (formData.email !== currentUser.email)
+        updatedData = { ...updatedData, email: formData.email };
+      if (formData.password !== "")
+        updatedData = { ...updatedData, password: formData.password };
+
+      if (!updatedData) {
         setLoading(false);
-        return setError("Nothing has been changed")
+        return setError("Nothing has been changed");
       }
 
-      const { validationError } = await validate(UpdateProfileSchema, updatedData);
-      if(validationError){
+      const { validationError } = await validate(
+        UpdateProfileSchema,
+        updatedData
+      );
+      if (validationError) {
         setLoading(false);
-        return setError(validationError)
+        return setError(validationError);
+      }
+
+      const error = await updateUser(updatedData);
+      if (error) {
+        setLoading(false);
+        return setError(error);
       }
 
       setLoading(false);
+      return navigate("/");
     } catch (error) {
       console.error(error);
     }

@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validate } from "../validators/Validate";
 import { LoginSchema } from "../validators/Users";
+import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { currentUser, loginUser } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      return navigate("/");
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -15,9 +27,6 @@ const Login = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -25,12 +34,19 @@ const Login = () => {
       setError("");
 
       const { validationError } = await validate(LoginSchema, formData);
-      if(validationError){
+      if (validationError) {
         setLoading(false);
-        return setError(validationError)
+        return setError(validationError);
+      }
+
+      const error= await loginUser(formData);
+      if (error) {
+        setLoading(false);
+        return setError(error);
       }
 
       setLoading(false);
+      return navigate("/");
     } catch (error) {
       console.error(error);
     }
@@ -46,7 +62,7 @@ const Login = () => {
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
               <Form.Control
-                type="text"
+                type="email"
                 name="email"
                 onChange={handleChange}
                 value={formData.email}

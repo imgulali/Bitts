@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SignUpSchema } from "../validators/Users";
 import { validate } from "../validators/Validate";
+import { useAuth } from "../contexts/AuthContext";
 
 const SignUp = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { currentUser, registerUser } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      return navigate("/");
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,9 +29,6 @@ const SignUp = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -28,15 +37,23 @@ const SignUp = () => {
       setError("");
 
       if (formData.password !== formData.confirmPass) {
+        setLoading(false);
         return setError("Passwords don't match");
       }
       const { validationError } = await validate(SignUpSchema, formData);
-      if(validationError){
+      if (validationError) {
         setLoading(false);
-        return setError(validationError)
+        return setError(validationError);
+      }
+
+      const error = await registerUser(formData);
+      if (error) {
+        setLoading(false);
+        return setError(error);
       }
 
       setLoading(false);
+      return navigate("/");
     } catch (error) {
       console.error(error);
     }
@@ -61,7 +78,7 @@ const SignUp = () => {
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
               <Form.Control
-                type="text"
+                type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -86,7 +103,7 @@ const SignUp = () => {
               />
             </Form.Group>
             <Button disabled={loading} className="w-100 mt-4" type="submit">
-              SignUp
+              Sign Up
             </Button>
           </Form>
         </Card.Body>
