@@ -21,7 +21,7 @@ export const loginUserApi = async (formData) => {
 export const fetchUserApi = async (authToken) => {
   try {
     const headers = {
-      authToken: authToken,
+     'Authorization': `Bearer ${authToken}`
     };
     const res = await API.post("/users/fetch", {}, { headers });
     return { error: null, data: res.data };

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const HOST = "http://localhost:5000/v1"
+const HOST = `${import.meta.env.VITE_HOST}`; //  Change the host name if wanted
 
 export const API = axios.create({
     baseURL: HOST,
