@@ -43,12 +43,11 @@ export const LoginUserSchema = joi.object({
 
 export const UpdateUserSchema = joi.object({
   name: joi.string().messages({
-    "any.required": "Name is required",
-    "string.empty": "Name is required",
+    "string.empty": "Name can not be empty",
   }),
 
   email: joi.string().email().messages({
-    "any.required": "Email is required",
+    "string.empty": "Email can not be empty",
     "string.email": "Invalid email format",
   }),
   phone: joi
@@ -61,11 +60,11 @@ export const UpdateUserSchema = joi.object({
       return cleanedPhoneNumber;
     })
     .messages({
-      "any.required": "Phone is required",
+      "string.empty": "Phone number can not be empty",
       "string.pattern.base": "Invalid phone number format",
     }),
   password: joi.string().min(6).messages({
-    "any.required": "Password is required",
+    "string.empty": "Password can not be empty",
     "string.min": "Password should be atleast of 6 chars",
   }),
 });
