@@ -14,6 +14,7 @@ const UpdateProfile = () => {
   const [formData, setFormData] = useState({
     name: currentUser.name,
     email: currentUser.email,
+    phone: currentUser.phone,
     password: "",
   });
 
@@ -33,6 +34,8 @@ const UpdateProfile = () => {
         updatedData = { ...updatedData, name: formData.name };
       if (formData.email !== currentUser.email)
         updatedData = { ...updatedData, email: formData.email };
+      if (formData.phone !== currentUser.phone)
+        updatedData = { ...updatedData, phone: formData.phone };
       if (formData.password !== "")
         updatedData = { ...updatedData, password: formData.password };
 
@@ -86,6 +89,15 @@ const UpdateProfile = () => {
                 name="email"
                 onChange={handleChange}
                 value={formData.email}
+              />
+            </Form.Group>
+            <Form.Group id="phone">
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control
+                name="phone"
+                onChange={handleChange}
+                value={formData.phone}
+                placeholder="Leave blank to keep same"
               />
             </Form.Group>
             <Form.Group id="password">
