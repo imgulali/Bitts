@@ -41,10 +41,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchUser = async () => {
-    const authToken = localStorage.getItem("authToken");
-    if (authToken) {
-      const parsed = await JSON.parse(authToken);
-      const { error, data } = await fetchUserApi(parsed);
+    const getAuthToken = localStorage.getItem("authToken");
+    if (getAuthToken) {
+      const authToken = await JSON.parse(getAuthToken);
+      const { error, data } = await fetchUserApi(authToken);
       if (data) {
         const user = data.data;
         setCurrentUser(user);
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = async (formData) => {
     const getAuthToken = localStorage.getItem("authToken");
-    if (getAuthToken) {
+    if ({getAuthToken}) {
       const authToken = await JSON.parse(getAuthToken);
       const { error, data } = await updateUserApi(authToken, formData);
       if (error) {
