@@ -1,14 +1,5 @@
 import joi from "joi";
-// import { cleanPhoneNumber } from "../utils/UserUtils.js";
-
-const cleanPhoneNumber = (phone) => {
-  let cleanedNumber = phone.replace(/\D/g, "");
-
-  if (cleanedNumber.length === 11 && cleanedNumber.startsWith("0")) {
-    cleanedNumber = "92" + cleanedNumber.substring(1);
-  }
-  return cleanedNumber;
-};
+import { cleanPhoneNumber } from "../utils/UserUtils.js";
 
 export const RegisterUserSchema = joi.object({
   name: joi.string().required().empty().messages({
