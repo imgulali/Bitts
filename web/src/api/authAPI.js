@@ -33,7 +33,7 @@ export const fetchUserApi = async (authToken) => {
 export const updateUserApi = async (authToken, formData) => {
   try {
     const headers = {
-      authToken: authToken,
+      authToken,
     };
     const res = await API.put("/users/update", formData, { headers });
     return { error: null, data: res.data };
