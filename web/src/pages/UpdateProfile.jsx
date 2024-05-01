@@ -4,6 +4,7 @@ import { validate } from "../validators/Validate";
 import { UpdateProfileSchema } from "../validators/Users";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { cleanPhoneNumber } from "../utils/UserUtils";
 
 const UpdateProfile = () => {
   const { currentUser, updateUser } = useAuth();
@@ -35,7 +36,7 @@ const UpdateProfile = () => {
       if (formData.email !== currentUser.email)
         updatedData = { ...updatedData, email: formData.email };
       if (formData.phone !== currentUser.phone)
-        updatedData = { ...updatedData, phone: formData.phone };
+        updatedData = { ...updatedData, phone: cleanPhoneNumber(formData.phone) };
       if (formData.password !== "")
         updatedData = { ...updatedData, password: formData.password };
 
